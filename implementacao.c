@@ -1,8 +1,29 @@
 #include "interface.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 
+typedef struct
+{
+	int *vet;
+	int tam;
+	int capacidade;
+} MinHeap;
+
+// Estrutura para representar um bloco
+typedef struct
+{
+	int *vet;
+	int tamBloco;
+	int proxElem;
+} Block;
+
+typedef struct Return
+{
+	long long int trocas;
+	long long int comparacoes;
+} tReturn;
 
 tReturn bubbleSort(int *vet, int tam)
 {
@@ -211,185 +232,253 @@ void QuickSort(int *vet, int inicio, int fim, tReturn *retorno)
 	}
 }
 
-MinHeap *criarMinHeap(int capacidade) {
-    MinHeap *minHeap = (MinHeap *)malloc(sizeof(MinHeap));
-    minHeap->capacidade = capacidade;
-    minHeap->tam = 0;
-    minHeap->vet = (int *)malloc(capacidade * sizeof(int));
-    return minHeap;
+MinHeap *criarMinHeap(int capacidade)
+{
+	MinHeap *minHeap = (MinHeap *)malloc(sizeof(MinHeap));
+	minHeap->capacidade = capacidade;
+	minHeap->tam = 0;
+	minHeap->vet = (int *)malloc(capacidade * sizeof(int));
+	return minHeap;
 }
 
-//Função para conseguir o índice do pai de um nó
-int pai(int i) {
-    return (i - 1) / 2;
+// Função para conseguir o índice do pai de um nó
+int pai(int i)
+{
+	return (i - 1) / 2;
 }
 
-//Função para inserir um elemento na min heap
-void insere(MinHeap *minHeap, int chave, tReturn *retorno) {
-    if (minHeap->tam == minHeap->capacidade) {
-        return;
-    }
+// Função para inserir um elemento na min heap
+void insere(MinHeap *minHeap, int chave, tReturn *retorno)
+{
+	if (minHeap->tam == minHeap->capacidade)
+	{
+		return;
+	}
 
-    minHeap->tam++;
-    int i = minHeap->tam - 1;
-    minHeap->vet[i] = chave;
+	minHeap->tam++;
+	int i = minHeap->tam - 1;
+	minHeap->vet[i] = chave;
 
-    //Corrige a propriedade da min heap
-    while (i != 0 && minHeap->vet[pai(i)] > minHeap->vet[i]) {
-        
-        int aux = minHeap->vet[i];
-        minHeap->vet[i] = minHeap->vet[pai(i)];
-        minHeap->vet[pai(i)] = aux;
-        retorno->comparacoes++;
-        retorno->trocas++;
+	// Corrige a propriedade da min heap
+	while (i != 0 && minHeap->vet[pai(i)] > minHeap->vet[i])
+	{
+		int aux = minHeap->vet[i];
+		minHeap->vet[i] = minHeap->vet[pai(i)];
+		minHeap->vet[pai(i)] = aux;
+		retorno->comparacoes++;
+		retorno->trocas++;
 
-        //Continua analisando pelo pai do nó atual
-        i = pai(i);
-    }
+		// Continua analisando pelo pai do nó atual
+		i = pai(i);
+	}
 }
 
-int extrairMin(MinHeap *minHeap, tReturn *retorno) {
-    if (minHeap->tam <= 0)
-        return -1;
+int extrairMin(MinHeap *minHeap, tReturn *retorno)
+{
+	if (minHeap->tam <= 0)
+		return -1;
 
-    if (minHeap->tam == 1) {
-        minHeap->tam--;
-        return minHeap->vet[0];
-    }
+	if (minHeap->tam == 1)
+	{
+		minHeap->tam--;
+		return minHeap->vet[0];
+	}
 
-    //Armazena o menor elemento e substitui pelo último elemento
-    int r = minHeap->vet[0];
-    minHeap->vet[0] = minHeap->vet[minHeap->tam - 1];
-    minHeap->tam--;
-    retorno->trocas++;
+	// Armazena o menor elemento e substitui pelo último elemento
+	int r = minHeap->vet[0];
+	minHeap->vet[0] = minHeap->vet[minHeap->tam - 1];
+	minHeap->tam--;
+	retorno->trocas++;
 
-    //Corrige a propriedade da min heap
-    int i = 0;
-    while (1) {
-        int esq = 2 * i + 1;
-        int dir = 2 * i  + 2;
-        int menor = i;
+	// Corrige a propriedade da min heap
+	int i = 0;
+	while (1)
+	{
+		int esq = 2 * i + 1;
+		int dir = 2 * i + 2;
+		int menor = i;
 
-        if (esq < minHeap->tam && minHeap->vet[esq] < minHeap->vet[i]){
-            menor = esq;
-            retorno->comparacoes++;
-        }
-            
+		if (esq < minHeap->tam && minHeap->vet[esq] < minHeap->vet[i])
+		{
+			menor = esq;
+			retorno->comparacoes++;
+		}
 
-        if (dir < minHeap->tam && minHeap->vet[dir] < minHeap->vet[menor]){
-            menor = dir;
-            retorno->comparacoes++;
-        }
-            
-        if (menor != i) {
-            int aux = minHeap->vet[i];
-            minHeap->vet[i] = minHeap->vet[menor];
-            minHeap->vet[menor] = aux;
-            i = menor;
-            retorno->trocas++;
-        } else {
-            break;
-        }
-    }
+		if (dir < minHeap->tam && minHeap->vet[dir] < minHeap->vet[menor])
+		{
+			menor = dir;
+			retorno->comparacoes++;
+		}
 
-    return r;
+		if (menor != i)
+		{
+			int aux = minHeap->vet[i];
+			minHeap->vet[i] = minHeap->vet[menor];
+			minHeap->vet[menor] = aux;
+			i = menor;
+			retorno->trocas++;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	return r;
 }
 
-//Função para dividir o vetor em blocos e ordená-los usando quicksort
-Block *divideEOrdena(int vet[], int n, int tamBloco, tReturn *retorno) {
+int Particiona(int *vet, int inicio, int fim, tReturn *retorno)
+{
+	int pivo = vet[inicio];
+	int pos = inicio;
+	int aux;
 
-    int numBlocos = (n + tamBloco - 1) / tamBloco;
-    Block *blocks = (Block *)malloc(numBlocos * sizeof(Block));
+	for (int i = inicio + 1; i <= fim; i++)
+	{
+		retorno->comparacoes++;
+		if (vet[i] < pivo)
+		{
+			pos++;
+			if (i != pos)
+			{
+				aux = vet[i];
+				vet[i] = vet[pos];
+				vet[pos] = aux;
+				retorno->trocas++;
+			}
+		}
+	}
 
-    //Ordena cada bloco separadamente usando o quicksort
-    for (int i = 0; i < numBlocos; i++) {
-        int inicio = i * tamBloco;
-        int tamanhoBloco;
-        if (i == numBlocos - 1) {
-            tamanhoBloco = n - i * tamBloco;
-        } else {
-            tamanhoBloco = tamBloco;
-        }
+	aux = vet[inicio];
+	vet[inicio] = vet[pos];
+	vet[pos] = aux;
+	retorno->trocas++;
 
-        blocks[i].vet = (int *)malloc(tamanhoBloco * sizeof(int));
-        for (int j = 0; j < tamanhoBloco; j++) {
-            blocks[i].vet[j] = vet[inicio + j];
-        }
-
-        //Ordena o bloco atual
-        QuickSort(blocks[i].vet, 0, tamanhoBloco - 1, retorno);
-
-        blocks[i].tamBloco = tamanhoBloco;
-        blocks[i].proxElem = 0;
-    }
-
-    return blocks;
+	return pos;
 }
 
+void QuickSort(int *vet, int inicio, int fim, tReturn *retorno)
+{
+	int posPivo;
 
-//Função para mesclar os blocos em um vetor ordenado usando uma min heap de forma recursiva
-void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, MinHeap *minHeap, tReturn *retorno) {
-    //Verifica se a min heap não está vazia
-    if (minHeap->tam > 0) {
-        int min = extrairMin(minHeap, retorno);
-        vet[iAux++] = min;
-
-        //Encontra o bloco a partir do qual o elemento foi extraído
-        for (int i = 0; i < numBlocos; i++) {
-            if (blocks[i].vet[blocks[i].proxElem] == min) {
-                blocks[i].proxElem++;
-
-                // Se ainda houver elementos no bloco, insere o próximo elemento na min heap
-                if (blocks[i].proxElem < blocks[i].tamBloco) {
-                    insere(minHeap, blocks[i].vet[blocks[i].proxElem], retorno);
-                }
-                break;
-            }
-        }
-        mergeBlocksRec(blocks, numBlocos, n, vet, iAux, minHeap, retorno);
-    }
+	if (inicio < fim)
+	{
+		posPivo = Particiona(vet, inicio, fim, retorno);
+		QuickSort(vet, inicio, posPivo - 1, retorno);
+		QuickSort(vet, posPivo + 1, fim, retorno);
+	}
 }
 
-void mergeBlocks(Block blocks[], int numBlocos, int n, int vet[], tReturn *retorno) {
-    MinHeap *minHeap = criarMinHeap(numBlocos);
+Block *divideEOrdena(int vet[], int n, int tamBloco, tReturn *retorno)
+{
 
-    // Insere o primeiro elemento de cada bloco na min heap
-    for (int i = 0; i < numBlocos; i++) {
-        if (blocks[i].tamBloco > 0) {
-            insere(minHeap, blocks[i].vet[0], retorno);
-        }
-    }
+	int numBlocos = (n + tamBloco - 1) / tamBloco;
+	Block *blocks = (Block *)malloc(numBlocos * sizeof(Block));
 
-    mergeBlocksRec(blocks, numBlocos, n, vet, 0, minHeap, retorno);
+	// Ordena cada bloco separadamente usando o quicksort
+	for (int i = 0; i < numBlocos; i++)
+	{
+		int inicio = i * tamBloco;
+		int tamanhoBloco;
+		if (i == numBlocos - 1)
+		{
+			tamanhoBloco = n - i * tamBloco;
+		}
+		else
+		{
+			tamanhoBloco = tamBloco;
+		}
 
-    free(minHeap->vet);
-    free(minHeap);
+		blocks[i].vet = (int *)malloc(tamanhoBloco * sizeof(int));
 
+		blocks[i].vet = &vet[inicio];
+
+		// Ordena o bloco atual
+		QuickSort(blocks[i].vet, 0, tamanhoBloco - 1, retorno);
+
+		blocks[i].tamBloco = tamanhoBloco;
+		blocks[i].proxElem = 0;
+	}
+
+	return blocks;
 }
 
+// Função para mesclar os blocos em um vetor ordenado usando uma min heap de forma recursiva
+void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, MinHeap *minHeap, tReturn *retorno)
+{
+	// Verifica se a min heap não está vazia
+	if (minHeap->tam > 0)
+	{
+		int min = extrairMin(minHeap, retorno);
+		vet[iAux++] = min;
 
-void BlockSort(int vet[], int n) {
-    tReturn *retorno = malloc(sizeof(tReturn));
-    retorno->comparacoes = 0;
-    retorno->trocas = 0;
-    int tamBloco = floor(sqrt(n));
-    Block *blocks = divideEOrdena(vet, n, tamBloco, retorno);
-    mergeBlocks(blocks, (n + tamBloco - 1) / tamBloco, n, vet, retorno);
-    printf("Comparações: %lld\n", retorno->comparacoes);
-    printf("Trocas: %lld\n", retorno->trocas);
+		// Encontra o bloco a partir do qual o elemento foi extraído
+		for (int i = 0; i < numBlocos; i++)
+		{
+			if (blocks[i].vet[blocks[i].proxElem] == min)
+			{
+				blocks[i].proxElem++;
 
-    free(blocks);
-    free(retorno);
-
+				// Se ainda houver elementos no bloco, insere o próximo elemento na min heap
+				if (blocks[i].proxElem < blocks[i].tamBloco)
+				{
+					insere(minHeap, blocks[i].vet[blocks[i].proxElem], retorno);
+				}
+				break;
+			}
+		}
+		mergeBlocksRec(blocks, numBlocos, n, vet, iAux, minHeap, retorno);
+	}
 }
 
+void mergeBlocks(Block blocks[], int numBlocos, int n, int vet[], tReturn *retorno)
+{
+	MinHeap *minHeap = criarMinHeap(numBlocos);
 
-void imprimeVetor(int vet[], int n){
-     for (int i = 0; i < n; i++)
-        printf("%d ", vet[i]);
-        printf("\n");
+	int *vetorAuxiliar = (int *)malloc(n * sizeof(int));
+
+	// Insere o primeiro elemento de cada bloco na min heap
+	for (int i = 0; i < numBlocos; i++)
+	{
+		if (blocks[i].tamBloco > 0)
+		{
+			insere(minHeap, blocks[i].vet[0], retorno);
+		}
+	}
+
+	mergeBlocksRec(blocks, numBlocos, n, vetorAuxiliar, 0, minHeap, retorno);
+
+	for (int i = 0; i < n; i++)
+	{
+		vet[i] = vetorAuxiliar[i];
+	}
+
+	free(vetorAuxiliar);
+	free(minHeap->vet);
+	free(minHeap);
 }
 
+void BlockSort(int vet[], int n)
+{
+	tReturn *retorno = malloc(sizeof(tReturn));
+	retorno->comparacoes = 0;
+	retorno->trocas = 0;
+	int tamBloco = floor(sqrt(n));
+	Block *blocks = divideEOrdena(vet, n, tamBloco, retorno);
+	mergeBlocks(blocks, (n + tamBloco - 1) / tamBloco, n, vet, retorno);
+	printf("Comparações: %lld\n", retorno->comparacoes);
+	printf("Trocas: %lld\n", retorno->trocas);
+
+	free(blocks);
+	free(retorno);
+}
+
+void imprimeVetor(int vet[], int n)
+{
+	for (int i = 0; i < n; i++)
+		printf("%d ", vet[i]);
+	printf("\n");
+}
 
 int *geraAleatorios(int tam, int semente)
 {
@@ -468,9 +557,9 @@ void benchmarkBubbleSort(int *vet_tam, int *vet_semente)
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
 	{
-		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int));		  // alocação do vetor para armazenar as trocas em cada execução
-		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));			  // alocação do vetor para armazenar as comparações em cada execução
-		double *vet_tempo = (double *)malloc(4 * sizeof(double)); // alocação do vetor para armazenar o tempo de cada execução
+		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int)); // alocação do vetor para armazenar as trocas em cada execução
+		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
+		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		int comp_total=0, trocas_total=0;
 		tReturn retorno;
@@ -534,8 +623,8 @@ void benchmarkBubbleSort(int *vet_tam, int *vet_semente)
 		vet_trocas[3] = trocas_total / 5;
 
 		fprintf(arq, "%d %d %f %f %f %f\n", i + 1, vet_tam[i], vet_tempo[0], vet_tempo[1], vet_tempo[2], vet_tempo[3]); // escreve no arquivo os tempos
-		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);							// escreve no arquivo as comparações
-		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);					// escreve no arquivo as trocas
+		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);					// escreve no arquivo as comparações
+		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);		// escreve no arquivo as trocas
 		free(vet_tempo);
 		free(vet_trocas);
 		free(vet_comp);
@@ -635,9 +724,9 @@ void benchmarkSelectionSort(int *vet_tam, int *vet_semente)
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
 	{
-		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int));		  // alocação do vetor para armazenar as trocas em cada execução
-		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));			  // alocação do vetor para armazenar as comparações em cada execução
-		double *vet_tempo = (double *)malloc(4 * sizeof(double)); // alocação do vetor para armazenar o tempo de cada execução
+		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int)); // alocação do vetor para armazenar as trocas em cada execução
+		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
+		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		tReturn retorno;
 		int comp_total=0, trocas_total=0;
@@ -701,8 +790,8 @@ void benchmarkSelectionSort(int *vet_tam, int *vet_semente)
 		vet_trocas[3] = trocas_total / 5;
 
 		fprintf(arq, "%d %d %f %f %f %f\n", i + 1, vet_tam[i], vet_tempo[0], vet_tempo[1], vet_tempo[2], vet_tempo[3]); // escreve no arquivo
-		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);							// escreve no arquivo as comparações
-		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);					// escreve no arquivo as trocas
+		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);					// escreve no arquivo as comparações
+		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);		// escreve no arquivo as trocas
 		free(vet_tempo);
 		free(vet_trocas);
 		free(vet_comp);
@@ -718,9 +807,9 @@ void benchmarkInsertionSort(int *vet_tam, int *vet_semente)
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
 	{
-		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int));		  // alocação do vetor para armazenar as trocas em cada execução
-		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));			  // alocação do vetor para armazenar as comparações em cada execução
-		double *vet_tempo = (double *)malloc(4 * sizeof(double)); // alocação do vetor para armazenar o tempo de cada execução
+		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int)); // alocação do vetor para armazenar as trocas em cada execução
+		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
+		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		tReturn retorno;
 		int comp_total=0, trocas_total=0;
@@ -784,8 +873,8 @@ void benchmarkInsertionSort(int *vet_tam, int *vet_semente)
 		vet_trocas[3] = trocas_total / 5; // armazena na quarta posição do vetor o quarto resultado
 
 		fprintf(arq, "%d %d %f %f %f %f\n", i + 1, vet_tam[i], vet_tempo[0], vet_tempo[1], vet_tempo[2], vet_tempo[3]); // escreve no arquivo
-		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);							// escreve no arquivo as comparações
-		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);					// escreve no arquivo as trocas
+		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);					// escreve no arquivo as comparações
+		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);		// escreve no arquivo as trocas
 
 		free(vet_tempo);
 		free(vet_trocas);
@@ -802,9 +891,9 @@ void benchmarkQuickSort(int *vet_tam, int *vet_semente)
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
 	{
-		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int));		  // alocação do vetor para armazenar as trocas em cada execução
-		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));			  // alocação do vetor para armazenar as comparações em cada execução
-		double *vet_tempo = (double *)malloc(4 * sizeof(double)); // alocação do vetor para armazenar o tempo de cada execução
+		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int)); // alocação do vetor para armazenar as trocas em cada execução
+		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
+		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		tReturn *retorno = (tReturn *)malloc(sizeof(tReturn));
 		retorno->comparacoes = 0;
@@ -829,7 +918,7 @@ void benchmarkQuickSort(int *vet_tam, int *vet_semente)
 		vet_tempo[0] = tempo_total / 5; // armazena na primeira posição do vetor o primeiro resultado
 		vet_comp[0] = comp_total / 5;
 		vet_trocas[0] = trocas_total / 5;
-		
+
 		retorno->comparacoes = 0;
 		retorno->trocas = 0;
 
@@ -883,9 +972,9 @@ void benchmarkQuickSort(int *vet_tam, int *vet_semente)
 		retorno->trocas = 0;
 
 		fprintf(arq, "%d %d %f %f %f %f\n", i + 1, vet_tam[i], vet_tempo[0], vet_tempo[1], vet_tempo[2], vet_tempo[3]); // escreve no arquivo
-		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);							// escreve no arquivo as comparações
-		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);					// escreve no arquivo as trocas
-		
+		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);					// escreve no arquivo as comparações
+		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);		// escreve no arquivo as trocas
+
 		free(retorno);
 		free(vet_tempo);
 		free(vet_trocas);
@@ -902,9 +991,9 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
 	{
-		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int));		  // alocação do vetor para armazenar as trocas em cada execução
-		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));			  // alocação do vetor para armazenar as comparações em cada execução
-		double *vet_tempo = (double *)malloc(4 * sizeof(double)); // alocação do vetor para armazenar o tempo de cada execução
+		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int)); // alocação do vetor para armazenar as trocas em cada execução
+		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
+		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		tReturn *retorno = (tReturn *)malloc(sizeof(tReturn));
 		retorno->comparacoes = 0;
@@ -916,7 +1005,7 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 		{
 			int *vet = geraAleatorios(vet_tam[i], vet_semente[i]); // chama a função de gerarAleatorios
 			clock_t start = clock();							   // inicia a contagem de tempo
-			MergeSort(vet, 0,vet_tam[i]-1,retorno);
+			MergeSort(vet, 0, vet_tam[i] - 1, retorno);
 			clock_t end = clock();											// finaliza a contagem de tempo
 			double tempo = ((double)(end - start)) * 1000 / CLOCKS_PER_SEC; // transforma o tempo em milissegundos
 			tempo_total += tempo;											// soma no total
@@ -935,7 +1024,7 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 		// Processamento com vetor ordenado crescente
 		int *vet = geraOrdenados(vet_tam[i], 0); // chama a função de geraOrdenados
 		clock_t start = clock();				 // inicia a contagem de tempo
-		MergeSort(vet, 0,vet_tam[i]-1,retorno);
+		MergeSort(vet, 0, vet_tam[i] - 1, retorno);
 		clock_t end = clock();											// finaliza a contagem de tempo
 		vet_tempo[1] = ((double)(end - start)) * 1000 / CLOCKS_PER_SEC; // armazena na segunda posição do vetor o segundo resultado
 		vet_comp[1] = retorno->comparacoes;
@@ -947,7 +1036,7 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 		// Processamento com vetor ordenado decrescente
 		vet = geraOrdenados(vet_tam[i], 1); // chama a função de geraOrdenados
 		start = clock();					// inicia a contagem de tempo
-		MergeSort(vet, 0,vet_tam[i]-1,retorno);
+		MergeSort(vet, 0, vet_tam[i] - 1, retorno);
 		end = clock();													// finaliza a contagem de tempo
 		vet_tempo[2] = ((double)(end - start)) * 1000 / CLOCKS_PER_SEC; // armazena na terceira posição do vetor o terceiro resultado
 		vet_comp[2] = retorno->comparacoes;
@@ -964,7 +1053,7 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 		{
 			int *vet = geraQuaseOrdenados(vet_tam[i], 10); // chama a função geraQuaseOrdenado
 			clock_t start = clock();					   // inicia a contagem de tempo
-			MergeSort(vet, 0,vet_tam[i]-1,retorno);
+			MergeSort(vet, 0, vet_tam[i] - 1, retorno);
 			clock_t end = clock();											// finaliza contagem de tempo
 			double tempo = ((double)(end - start)) * 1000 / CLOCKS_PER_SEC; // transforma o tempo em milissegundos
 			tempo_total += tempo;											// soma no total
@@ -982,8 +1071,8 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 		retorno->trocas = 0;
 
 		fprintf(arq, "%d %d %f %f %f %f\n", i + 1, vet_tam[i], vet_tempo[0], vet_tempo[1], vet_tempo[2], vet_tempo[3]); // escreve no arquivo
-		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);							// escreve no arquivo as comparações
-		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);					// escreve no arquivo as trocas
+		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);					// escreve no arquivo as comparações
+		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);		// escreve no arquivo as trocas
 
 		free(retorno);
 		free(vet_tempo);
