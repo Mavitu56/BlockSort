@@ -1,6 +1,7 @@
 #ifndef SORTING_ALGORITHMS_H
 #define SORTING_ALGORITHMS_H
 
+typedef struct Return;
 void bubbleSort(int *vet, int tam);
 void selectionSort(int *vet, int tam);
 void insertionSort(int *vet, int tam);

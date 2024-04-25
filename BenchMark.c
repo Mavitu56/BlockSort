@@ -3,25 +3,27 @@
 #include <stdlib.h>
 #include <time.h>
 
+typedef struct Return{
+    int trocas;
+    int comparacoes;
+} tReturn;
+
 void bubbleSort(int *vet, int tam)
 {
-	int i, j;
-	int comp = 0;
-	int temp;
-	for (i = 0; i < tam - 1; i++)
-	{
-		for (j = 0; j < tam - i - 1; j++)
-		{
-			comp++;
-			if (vet[j] > vet[j + 1])
-			{
-				temp = vet[j];
-				vet[j] = vet[j + 1];
-				vet[j + 1] = temp;
-			}
-		}
-	}
-	return comp;
+	int cont = 0, i, j, aux,trocas=0;
+
+    for (i = 0; i < tam; i++)
+        for (j = 0; j < tam - 1; j++) {
+            cont++;
+            if (vet[j] > vet[j + 1]) {
+                aux = vet[j];
+                vet[j] = vet[j + 1];
+                vet[j + 1] = aux;
+				trocas++;
+            }
+        }
+
+    return cont;
 }
 
 void selectionSort(int *vet, int tam)
