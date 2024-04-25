@@ -42,7 +42,7 @@ int extrairMin(MinHeap *minHeap, tReturn *retorno);
 Block *divideEOrdena(int vet[], int n, int tamBloco, tReturn *retorno);
 void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, MinHeap *minHeap, tReturn *retorno);
 void mergeBlocks(Block blocks[], int numBlocos, int n, int vet[], tReturn *retorno);
-void BlockSort(int vet[], int n);
+void BlockSort(int vet[], int n,tReturn *retorno);
 void imprimeVetor(int vet[], int n);
 
 // Assinatura das funções do benchmarking
@@ -54,5 +54,7 @@ void benchmarkSelectionSort(int *vet_tam, int *vet_semente);
 void benchmarkInsertionSort(int *vet_tam, int *vet_semente);
 void benchmarkQuickSort(int *vet_tam, int *vet_semente);
 void benchmarkMergeSort(int *vet_tam, int *vet_semente);
+void benchmarkBlockSort(int *vet_tam, int *vet_semente);
+void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente);
 
 #endif /* SORTING_ALGORITHMS_H */
