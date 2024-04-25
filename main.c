@@ -225,7 +225,7 @@ void mergeBlocks(int vet[], Block blocks[], int numBlocos, int n)
     free(minHeap);
 }
 
-void *BlockSort(int vet[], int n)
+void BlockSort(int vet[], int n)
 {
     int tamBloco = floor(sqrt(n));
     Block *blocks = divideEOrdena(vet, n, tamBloco);
