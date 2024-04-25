@@ -1,26 +1,12 @@
 #ifndef SORTING_ALGORITHMS_H
 #define SORTING_ALGORITHMS_H
 
-typedef struct
-{
-    int *vet;
-    int tam;
-    int capacidade;
-} MinHeap;
+typedef struct MinHeap MinHeap;
 
 // Estrutura para representar um bloco
-typedef struct
-{
-    int *vet;
-    int tamBloco;
-    int proxElem;
-} Block;
+typedef struct Block Block;
 
-typedef struct Return
-{
-    long long int trocas;
-    long long int comparacoes;
-} tReturn;
+typedef struct Return tReturn;
 
 // Assinatura das funções de ordenação estudadas
 tReturn bubbleSort(int *vet, int tam);
@@ -40,8 +26,8 @@ int extrairMin(MinHeap *minHeap, tReturn *retorno);
 
 // Assinatura das funções do BlockSort
 Block *divideEOrdena(int vet[], int n, int tamBloco, tReturn *retorno);
-void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, MinHeap *minHeap, tReturn *retorno);
-void mergeBlocks(Block blocks[], int numBlocos, int n, int vet[], tReturn *retorno);
+void mergeBlocksRec(Block *blocks, int numBlocos, int n, int vet[], int iAux, MinHeap *minHeap, tReturn *retorno);
+void mergeBlocks(Block *blocks, int numBlocos, int n, int vet[], tReturn *retorno);
 void BlockSort(int vet[], int n);
 void imprimeVetor(int vet[], int n);
 

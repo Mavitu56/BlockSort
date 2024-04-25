@@ -23,6 +23,7 @@ int main()
 	benchmarkSelectionSort(vet_tam, vet_semente);
 	benchmarkBubbleSortInteligente(vet_tam, vet_semente);
 	benchmarkBubbleSort(vet_tam, vet_semente);
+    */
     
     return 0;
 }

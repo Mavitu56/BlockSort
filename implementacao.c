@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 
-typedef struct
+typedef struct MinHeap
 {
 	int *vet;
 	int tam;
@@ -12,7 +12,7 @@ typedef struct
 } MinHeap;
 
 // Estrutura para representar um bloco
-typedef struct
+typedef struct Block
 {
 	int *vet;
 	int tamBloco;
@@ -53,29 +53,31 @@ tReturn bubbleSortIntelgente(int *vet, int tam)
 	retorno.trocas = 0;
 	retorno.comparacoes = 0;
 
-	    int i, j, aux, troca = 0;
+	int i, j, aux, troca = 0;
 
-    for (i = 0; i < tam-1; i++) {
-        troca = 0;
-		j=0;
-        while (j < (tam - i -1)) {
-            retorno.comparacoes++;
-            if (vet[j] > vet[j + 1]) {
-                aux = vet[j];
-                vet[j] = vet[j + 1];
-                vet[j + 1] = aux;
-                troca = 1;
+	for (i = 0; i < tam - 1; i++)
+	{
+		troca = 0;
+		j = 0;
+		while (j < (tam - i - 1))
+		{
+			retorno.comparacoes++;
+			if (vet[j] > vet[j + 1])
+			{
+				aux = vet[j];
+				vet[j] = vet[j + 1];
+				vet[j + 1] = aux;
+				troca = 1;
 				retorno.trocas++;
-            }
-            j++;
+			}
+			j++;
+		}
 
-        }
+		if (troca == 0)
+			break;
+	}
 
-        if (troca == 0)
-            break;
-    }
-
-    return retorno;
+	return retorno;
 }
 
 tReturn SelectionSort(int vet[], int tam)
@@ -327,48 +329,6 @@ int extrairMin(MinHeap *minHeap, tReturn *retorno)
 	return r;
 }
 
-int Particiona(int *vet, int inicio, int fim, tReturn *retorno)
-{
-	int pivo = vet[inicio];
-	int pos = inicio;
-	int aux;
-
-	for (int i = inicio + 1; i <= fim; i++)
-	{
-		retorno->comparacoes++;
-		if (vet[i] < pivo)
-		{
-			pos++;
-			if (i != pos)
-			{
-				aux = vet[i];
-				vet[i] = vet[pos];
-				vet[pos] = aux;
-				retorno->trocas++;
-			}
-		}
-	}
-
-	aux = vet[inicio];
-	vet[inicio] = vet[pos];
-	vet[pos] = aux;
-	retorno->trocas++;
-
-	return pos;
-}
-
-void QuickSort(int *vet, int inicio, int fim, tReturn *retorno)
-{
-	int posPivo;
-
-	if (inicio < fim)
-	{
-		posPivo = Particiona(vet, inicio, fim, retorno);
-		QuickSort(vet, inicio, posPivo - 1, retorno);
-		QuickSort(vet, posPivo + 1, fim, retorno);
-	}
-}
-
 Block *divideEOrdena(int vet[], int n, int tamBloco, tReturn *retorno)
 {
 
@@ -482,12 +442,12 @@ void imprimeVetor(int vet[], int n)
 
 int *geraAleatorios(int tam, int semente)
 {
-	//utiliza a semente para gerar números aleatórios
+	// utiliza a semente para gerar números aleatórios
 	srand(semente);
 	int *vetor = (int *)malloc(tam * sizeof(int));
 	for (int i = 0; i < tam; i++)
 	{
-		vetor[i] = rand() % tam; //gera números aleatórios entre 0 e tam-1
+		vetor[i] = rand() % tam; // gera números aleatórios entre 0 e tam-1
 	}
 	return vetor;
 }
@@ -495,34 +455,35 @@ int *geraAleatorios(int tam, int semente)
 int *geraQuaseOrdenados(int tam, int porcentagem)
 {
 	// abordagem 1
-	int* vetor = (int*)malloc(tam * sizeof(int));
-	int num_desordenados = tam * porcentagem / 100; // calcula a quantidade de elementos que serão desordenados
-	int* indices = (int*)malloc(tam * sizeof(int)); // aloca um vetor de indices para embaralhar os elementos
+	int *vetor = (int *)malloc(tam * sizeof(int));
+	int num_desordenados = tam * porcentagem / 100;	 // calcula a quantidade de elementos que serão desordenados
+	int *indices = (int *)malloc(tam * sizeof(int)); // aloca um vetor de indices para embaralhar os elementos
 
-
-	for (int i = 0; i < tam; i++) {
+	for (int i = 0; i < tam; i++)
+	{
 		// preenche o vetor com valores ordenados
 		vetor[i] = i;
-		indices[i] = i; 
+		indices[i] = i;
 	}
 
-	for (int i = 0; i < num_desordenados; i++) {
-		// define os indices aleatoriamente em que ficarão os elementos desordenados 
+	for (int i = 0; i < num_desordenados; i++)
+	{
+		// define os indices aleatoriamente em que ficarão os elementos desordenados
 		int temp = indices[i];
 		int random_index = rand() % tam;
 		indices[i] = indices[random_index];
 		indices[random_index] = temp;
 	}
 
-	for (int i = 0; i < num_desordenados; i++) {
+	for (int i = 0; i < num_desordenados; i++)
+	{
 		vetor[indices[i]] = rand() % tam; // preenche os elementos desordenados com valores aleatórios
 	}
 
-	//dessa forma, o vetor está quase ordenado
+	// dessa forma, o vetor está quase ordenado
 
 	free(indices);
 	return vetor;
-
 }
 
 int *geraOrdenados(int tam, int ordem)
@@ -561,7 +522,7 @@ void benchmarkBubbleSort(int *vet_tam, int *vet_semente)
 		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
 		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
-		int comp_total=0, trocas_total=0;
+		int comp_total = 0, trocas_total = 0;
 		tReturn retorno;
 
 		// Processamento com vetor aleatório
@@ -601,8 +562,8 @@ void benchmarkBubbleSort(int *vet_tam, int *vet_semente)
 		vet_trocas[2] = retorno.trocas;
 		free(vet);
 		tempo_total = 0.0;
-		comp_total=0;
-		trocas_total=0;
+		comp_total = 0;
+		trocas_total = 0;
 
 		// Processamento com vetor Quase Ordenado
 		for (int j = 0; j < 5; j++)
@@ -641,11 +602,11 @@ void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente)
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
 	{
-		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int));		  // alocação do vetor para armazenar as trocas em cada execução
-		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));			  // alocação do vetor para armazenar as comparações em cada execução
-		double *vet_tempo = (double *)malloc(4 * sizeof(double)); // alocação do vetor para armazenar o tempo de cada execução
+		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int)); // alocação do vetor para armazenar as trocas em cada execução
+		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
+		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
-		int comp_total=0, trocas_total=0;
+		int comp_total = 0, trocas_total = 0;
 		tReturn retorno;
 
 		// Processamento com vetor aleatório
@@ -685,8 +646,8 @@ void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente)
 		vet_trocas[2] = retorno.trocas;
 		free(vet);
 		tempo_total = 0.0;
-		comp_total=0;
-		trocas_total=0;
+		comp_total = 0;
+		trocas_total = 0;
 
 		// Processamento com vetor Quase Ordenado
 		for (int j = 0; j < 5; j++)
@@ -707,8 +668,8 @@ void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente)
 		vet_trocas[3] = trocas_total / 5;
 
 		fprintf(arq, "%d %d %f %f %f %f\n", i + 1, vet_tam[i], vet_tempo[0], vet_tempo[1], vet_tempo[2], vet_tempo[3]); // escreve no arquivo os tempos
-		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);							// escreve no arquivo as comparações
-		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);					// escreve no arquivo as trocas
+		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);					// escreve no arquivo as comparações
+		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);		// escreve no arquivo as trocas
 		free(vet_tempo);
 		free(vet_trocas);
 		free(vet_comp);
@@ -729,7 +690,7 @@ void benchmarkSelectionSort(int *vet_tam, int *vet_semente)
 		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		tReturn retorno;
-		int comp_total=0, trocas_total=0;
+		int comp_total = 0, trocas_total = 0;
 
 		// Processamento com vetor aleatório
 		for (int j = 0; j < 5; j++)
@@ -768,8 +729,8 @@ void benchmarkSelectionSort(int *vet_tam, int *vet_semente)
 		vet_trocas[2] = retorno.trocas;									// armazena na terceira posição do vetor o terceiro resultado
 		free(vet);
 		tempo_total = 0.0;
-		comp_total=0;
-		trocas_total=0;
+		comp_total = 0;
+		trocas_total = 0;
 
 		// Processamento com vetor Quase Ordenado
 		for (int j = 0; j < 5; j++)
@@ -812,7 +773,7 @@ void benchmarkInsertionSort(int *vet_tam, int *vet_semente)
 		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		tReturn retorno;
-		int comp_total=0, trocas_total=0;
+		int comp_total = 0, trocas_total = 0;
 
 		// Processamento com vetor aleatório
 		for (int j = 0; j < 5; j++)
@@ -851,8 +812,8 @@ void benchmarkInsertionSort(int *vet_tam, int *vet_semente)
 		vet_trocas[2] = retorno.trocas;									// armazena na terceira posição do vetor o terceiro resultado
 		free(vet);
 		tempo_total = 0.0;
-		comp_total=0;
-		trocas_total=0;
+		comp_total = 0;
+		trocas_total = 0;
 
 		// Processamento com vetor Quase Ordenado
 		for (int j = 0; j < 5; j++)
@@ -898,7 +859,7 @@ void benchmarkQuickSort(int *vet_tam, int *vet_semente)
 		tReturn *retorno = (tReturn *)malloc(sizeof(tReturn));
 		retorno->comparacoes = 0;
 		retorno->trocas = 0;
-		int comp_total=0, trocas_total=0;
+		int comp_total = 0, trocas_total = 0;
 
 		// Processamento com vetor aleatório
 		for (int j = 0; j < 5; j++)
@@ -946,8 +907,8 @@ void benchmarkQuickSort(int *vet_tam, int *vet_semente)
 		retorno->trocas = 0;
 		free(vet);
 		tempo_total = 0.0;
-		comp_total=0;
-		trocas_total=0;
+		comp_total = 0;
+		trocas_total = 0;
 
 		// Processamento com vetor Quase Ordenado
 		for (int j = 0; j < 5; j++)
@@ -998,7 +959,7 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 		tReturn *retorno = (tReturn *)malloc(sizeof(tReturn));
 		retorno->comparacoes = 0;
 		retorno->trocas = 0;
-		int comp_total=0, trocas_total=0;
+		int comp_total = 0, trocas_total = 0;
 
 		// Processamento com vetor aleatório
 		for (int j = 0; j < 5; j++)
@@ -1045,8 +1006,8 @@ void benchmarkMergeSort(int *vet_tam, int *vet_semente)
 		retorno->trocas = 0;
 		free(vet);
 		tempo_total = 0.0;
-		comp_total=0;
-		trocas_total=0;
+		comp_total = 0;
+		trocas_total = 0;
 
 		// Processamento com vetor Quase Ordenado
 		for (int j = 0; j < 5; j++)
@@ -1090,14 +1051,14 @@ void benchmarkBlockSort(int *vet_tam, int *vet_semente)
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
 	{
-		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int));		  // alocação do vetor para armazenar as trocas em cada execução
-		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));			  // alocação do vetor para armazenar as comparações em cada execução
-		double *vet_tempo = (double *)malloc(4 * sizeof(double)); // alocação do vetor para armazenar o tempo de cada execução
+		long long int *vet_trocas = (long long int *)malloc(4 * sizeof(long long int)); // alocação do vetor para armazenar as trocas em cada execução
+		long long int *vet_comp = (long long int *)malloc(4 * sizeof(long long int));	// alocação do vetor para armazenar as comparações em cada execução
+		double *vet_tempo = (double *)malloc(4 * sizeof(double));						// alocação do vetor para armazenar o tempo de cada execução
 		double tempo_total = 0.0;
 		tReturn *retorno = (tReturn *)malloc(sizeof(tReturn));
 		retorno->comparacoes = 0;
 		retorno->trocas = 0;
-		int comp_total=0, trocas_total=0;
+		int comp_total = 0, trocas_total = 0;
 
 		// Processamento com vetor aleatório
 		for (int j = 0; j < 5; j++)
@@ -1115,7 +1076,6 @@ void benchmarkBlockSort(int *vet_tam, int *vet_semente)
 		vet_tempo[0] = tempo_total / 5; // armazena na primeira posição do vetor o primeiro resultado
 		vet_comp[0] = comp_total / 5;
 		vet_trocas[0] = trocas_total / 5;
-
 
 		// Processamento com vetor ordenado crescente
 		int *vet = geraOrdenados(vet_tam[i], 0); // chama a função de geraOrdenados
@@ -1141,8 +1101,8 @@ void benchmarkBlockSort(int *vet_tam, int *vet_semente)
 		retorno->trocas = 0;
 		free(vet);
 		tempo_total = 0.0;
-		comp_total=0;
-		trocas_total=0;
+		comp_total = 0;
+		trocas_total = 0;
 
 		// Processamento com vetor Quase Ordenado
 		for (int j = 0; j < 5; j++)
@@ -1163,8 +1123,8 @@ void benchmarkBlockSort(int *vet_tam, int *vet_semente)
 		vet_trocas[3] = trocas_total / 5;
 
 		fprintf(arq, "%d %d %f %f %f %f\n", i + 1, vet_tam[i], vet_tempo[0], vet_tempo[1], vet_tempo[2], vet_tempo[3]); // escreve no arquivo
-		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);							// escreve no arquivo as comparações
-		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);					// escreve no arquivo as trocas
+		fprintf(arq, "   %lld %lld %lld %lld\n", vet_comp[0], vet_comp[1], vet_comp[2], vet_comp[3]);					// escreve no arquivo as comparações
+		fprintf(arq, "   %lld %lld %lld %lld\n\n\n", vet_trocas[0], vet_trocas[1], vet_trocas[2], vet_trocas[3]);		// escreve no arquivo as trocas
 
 		free(retorno);
 		free(vet_tempo);
@@ -1172,4 +1132,3 @@ void benchmarkBlockSort(int *vet_tam, int *vet_semente)
 		free(vet_comp);
 	}
 }
-
