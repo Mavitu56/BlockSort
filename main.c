@@ -17,7 +17,7 @@ typedef struct
     int proxElem;
 } Block;
 
-// Função para criar uma nova min heap
+
 MinHeap *criarMinHeap(int capacidade)
 {
     MinHeap *minHeap = (MinHeap *)malloc(sizeof(MinHeap));
@@ -146,13 +146,13 @@ void QuickSort(int *vet, int inicio, int fim)
 // Função para dividir o vetor em blocos e ordená-los usando quicksort
 Block *divideEOrdena(int vet[], int n, int tamBloco)
 {
-    // Calcula o número de blocos
+    
     int numBlocos = (n + tamBloco - 1) / tamBloco;
 
-    // Aloca memória para os blocos
+    
     Block *blocks = (Block *)malloc(numBlocos * sizeof(Block));
 
-    // Ordena cada bloco separadamente usando o quicksort
+    // Ordena cada bloco separadamente
     for (int i = 0; i < numBlocos; i++)
     {
         int inicio = i * tamBloco;
@@ -166,10 +166,8 @@ Block *divideEOrdena(int vet[], int n, int tamBloco)
             tamanhoBloco = tamBloco;
         }
 
-        // Ordena o bloco atual usando o quicksort
         QuickSort(vet, inicio, inicio + tamanhoBloco - 1);
 
-        // Define os detalhes do bloco
         blocks[i].vet = &vet[inicio];
         blocks[i].tamBloco = tamanhoBloco;
         blocks[i].proxElem = 0;
@@ -178,7 +176,7 @@ Block *divideEOrdena(int vet[], int n, int tamBloco)
     return blocks;
 }
 
-// Função para mesclar os blocos em um vetor ordenado usando uma min heap
+// Função para mesclar os blocos em um vetor ordenado usando uma min heap de forma recursiva
 void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, MinHeap *minHeap)
 {
     // Verifica se a min heap não está vazia
@@ -203,14 +201,14 @@ void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, M
                 break;
             }
         }
-        // Chamada recursiva apenas se a min heap não estiver vazia
+      
         mergeBlocksRec(blocks, numBlocos, n, vet, iAux, minHeap);
     }
 }
 
 void mergeBlocks(int vet[], Block blocks[], int numBlocos, int n)
 {
-    // Cria uma min heap
+
     MinHeap *minHeap = criarMinHeap(numBlocos);
 
     // Insere o primeiro elemento de cada bloco na min heap
@@ -222,47 +220,34 @@ void mergeBlocks(int vet[], Block blocks[], int numBlocos, int n)
         }
     }
 
-    // Chama a função recursiva para mesclar os blocos
     mergeBlocksRec(blocks, numBlocos, n, vet, 0, minHeap);
-
-    // Libera a memória alocada para a min heap
     free(minHeap->vet);
     free(minHeap);
 }
 
 void *BlockSort(int vet[], int n)
 {
-    // Tamanho do bloco
     int tamBloco = floor(sqrt(n));
-
-    // Divide e ordena os blocos
     Block *blocks = divideEOrdena(vet, n, tamBloco);
-
-    // Mescla os blocos em um vetor ordenado usando uma min heap
     mergeBlocks(vet, blocks, (n + tamBloco - 1) / tamBloco, n);
 
-    // Libera a memória alocada para os blocos
     free(blocks);
 }
 
-// Função principal
+void imprimeVetor(int vet[], int n){
+     for (int i = 0; i < n; i++)
+        printf("%d ", vet[i]);
+        printf("\n");
+}
+
 int main()
 {
     int vet[] = {5, 8, 3, 9, 4, 2, 6, 1, 7, 10, 14, 18, 20, 3, 4, 19, 115, 600, 230, 4, 1300, 10000, 7, 29, 612, 515, 447, 47, 400, 4000, 1000, 12, 29, 115, 167, 312};
     int n = sizeof(vet) / sizeof(vet[0]);
 
-    printf("Vetor original: ");
-    for (int i = 0; i < n; i++)
-        printf("%d ", vet[i]);
-    printf("\n");
-
+    imprimeVetor(vet, n);
     BlockSort(vet, n);
-
-    // Imprime o vetor ordenado
-    printf("Vetor ordenado: ");
-    for (int i = 0; i < n; i++)
-        printf("%d ", vet[i]);
-    printf("\n");
+    imprimeVetor(vet, n);
 
     return 0;
 }
