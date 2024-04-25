@@ -25,7 +25,7 @@ tReturn bubbleSort(int *vet, int tam)
 				aux = vet[j];
 				vet[j] = vet[j + 1];
 				vet[j + 1] = aux;
-				retorno.comparacoes++;
+				retorno.trocas++;
 			}
 		}
 
@@ -38,33 +38,29 @@ tReturn bubbleSortIntelgente(int *vet, int tam)
 	retorno.trocas = 0;
 	retorno.comparacoes = 0;
 
-	int cont = 0, i, j, aux, troca = 0;
+	    int i, j, aux, troca = 0;
 
-	for (i = 1; i < tam; i++)
-	{
-		j = 0;
-		troca = 0;
-
-		while (j < (tam - i))
-		{
-			if (vet[j] > vet[j + 1])
-			{
-				aux = vet[j];
-				vet[j] = vet[j + 1];
-				vet[j + 1] = aux;
-				troca = 1;
-			}
-			retorno.comparacoes++;
-			if (troca)
+    for (i = 0; i < tam-1; i++) {
+        troca = 0;
+		j=0;
+        while (j < (tam - i -1)) {
+            retorno.comparacoes++;
+            if (vet[j] > vet[j + 1]) {
+                aux = vet[j];
+                vet[j] = vet[j + 1];
+                vet[j + 1] = aux;
+                troca = 1;
 				retorno.trocas++;
-			j++;
-		}
+            }
+            j++;
 
-		if (troca == 0)
-			return retorno;
-	}
+        }
 
-	return retorno;
+        if (troca == 0)
+            break;
+    }
+
+    return retorno;
 }
 
 tReturn SelectionSort(int vet[], int tam)
@@ -88,6 +84,7 @@ tReturn SelectionSort(int vet[], int tam)
 				menor = i;
 			}
 		}
+		retorno.comparacoes++;
 		if (menor != marcador)
 		{
 			aux = vet[marcador];
@@ -238,8 +235,6 @@ int *geraAleatorios(int tam, int semente)
 
 int *geraQuaseOrdenados(int tam, int porcentagem)
 {
-	// abordagem 1
-	/*
 	int* vetor = (int*)malloc(tam * sizeof(int));
 	int num_desordenados = tam * porcentagem / 100;
 	int* indices = (int*)malloc(tam * sizeof(int));
@@ -262,28 +257,6 @@ int *geraQuaseOrdenados(int tam, int porcentagem)
 	}
 
 	free(indices);
-	return vetor;
-
-
-  */
-
-	// abordagem 2
-	int *vetor = (int *)malloc(tam * sizeof(int));
-
-	for (int i = 0; i < tam; i++)
-	{
-
-		if (rand() % 100 < porcentagem)
-		{
-
-			vetor[i] = rand() % tam;
-		}
-		else
-		{
-
-			vetor[i] = i;
-		}
-	}
 
 	return vetor;
 }
@@ -818,7 +791,7 @@ void benchmarkBlockSort(int *vet_tam, int *vet_semente)
 int main()
 {
 
-	int vet_tam[5] = {100, 500, 1000, 5000, 10000};
+	int vet_tam[5] = {5, 10, 15, 20, 25};
 	int vet_semente[5] = {1, 2, 3, 4, 5};
 	benchmarkMergeSort(vet_tam, vet_semente);
 	benchmarkQuickSort(vet_tam, vet_semente);
