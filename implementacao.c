@@ -1,14 +1,8 @@
-#include "BenchMark.h"
+#include "interface.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-
-typedef struct Return
-{
-	long long int trocas;
-	long long int comparacoes;
-} tReturn;
 
 tReturn bubbleSort(int *vet, int tam)
 {
@@ -126,6 +120,55 @@ tReturn InsertionSort(int vet[], int tam)
 	return retorno;
 }
 
+void MergeSort(int *vet, int inicio, int fim, tReturn *retorno)
+{
+	int meio;
+	if (inicio < fim)
+	{
+		meio = (inicio + fim) / 2;
+		MergeSort(vet, inicio, meio, retorno);
+		MergeSort(vet, meio + 1, fim, retorno);
+		Merge(vet, inicio, meio, fim, retorno);
+	}
+}
+
+void Merge(int *vet, int inicio, int meio, int fim, tReturn *retorno)
+{
+	int marcador1 = inicio;
+	int marcador2 = meio + 1;
+	int i = 0;
+	int *vetoraux;
+
+	vetoraux = (int *)malloc(((fim - inicio) + 1) * sizeof(int));
+	if (vetoraux == NULL)
+	{
+		printf("ERRO AO ALOCAR MEMÓRIA\n");
+		exit(1);
+	}
+
+	while (marcador1 <= meio && marcador2 <= fim)
+	{
+		retorno->comparacoes++;
+		if (vet[marcador1] <= vet[marcador2])
+			vetoraux[i++] = vet[marcador1++];
+		else
+			vetoraux[i++] = vet[marcador2++];
+	}
+	while (marcador1 <= meio)
+		vetoraux[i++] = vet[marcador1++];
+
+	while (marcador2 <= fim)
+		vetoraux[i++] = vet[marcador2++];
+
+	for (marcador1 = inicio; marcador1 <= fim; marcador1++)
+	{
+		vet[marcador1] = vetoraux[marcador1 - inicio];
+		retorno->trocas++;
+	}
+
+	free(vetoraux);
+}
+
 int Particiona(int *vet, int inicio, int fim, tReturn *retorno)
 {
 	int pivo = vet[inicio];
@@ -168,59 +211,185 @@ void QuickSort(int *vet, int inicio, int fim, tReturn *retorno)
 	}
 }
 
-void MergeSort(int *vet, int inicio, int fim, tReturn *retorno)
-{
-	int meio;
-	if (inicio < fim)
-	{
-		meio = (inicio + fim) / 2;
-		MergeSort(vet, inicio, meio, retorno);
-		MergeSort(vet, meio + 1, fim, retorno);
-		Merge(vet, inicio, meio, fim, retorno);
-	}
+MinHeap *criarMinHeap(int capacidade) {
+    MinHeap *minHeap = (MinHeap *)malloc(sizeof(MinHeap));
+    minHeap->capacidade = capacidade;
+    minHeap->tam = 0;
+    minHeap->vet = (int *)malloc(capacidade * sizeof(int));
+    return minHeap;
 }
 
-void blockSort()
-{
-	// blockSort
+//Função para conseguir o índice do pai de um nó
+int pai(int i) {
+    return (i - 1) / 2;
 }
 
-void Merge(int *vet, int inicio, int meio, int fim, tReturn *retorno)
-{
-	int marcador1 = inicio;
-	int marcador2 = meio + 1;
-	int i = 0;
-	int *vetoraux;
+//Função para inserir um elemento na min heap
+void insere(MinHeap *minHeap, int chave, tReturn *retorno) {
+    if (minHeap->tam == minHeap->capacidade) {
+        return;
+    }
 
-	vetoraux = (int *)malloc(((fim - inicio) + 1) * sizeof(int));
-	if (vetoraux == NULL)
-	{
-		printf("ERRO AO ALOCAR MEMÓRIA\n");
-		exit(1);
-	}
+    minHeap->tam++;
+    int i = minHeap->tam - 1;
+    minHeap->vet[i] = chave;
 
-	while (marcador1 <= meio && marcador2 <= fim)
-	{
-		retorno->comparacoes++;
-		if (vet[marcador1] <= vet[marcador2])
-			vetoraux[i++] = vet[marcador1++];
-		else
-			vetoraux[i++] = vet[marcador2++];
-	}
-	while (marcador1 <= meio)
-		vetoraux[i++] = vet[marcador1++];
+    //Corrige a propriedade da min heap
+    while (i != 0 && minHeap->vet[pai(i)] > minHeap->vet[i]) {
+        
+        int aux = minHeap->vet[i];
+        minHeap->vet[i] = minHeap->vet[pai(i)];
+        minHeap->vet[pai(i)] = aux;
+        retorno->comparacoes++;
+        retorno->trocas++;
 
-	while (marcador2 <= fim)
-		vetoraux[i++] = vet[marcador2++];
-
-	for (marcador1 = inicio; marcador1 <= fim; marcador1++)
-	{
-		vet[marcador1] = vetoraux[marcador1 - inicio];
-		retorno->trocas++;
-	}
-
-	free(vetoraux);
+        //Continua analisando pelo pai do nó atual
+        i = pai(i);
+    }
 }
+
+int extrairMin(MinHeap *minHeap, tReturn *retorno) {
+    if (minHeap->tam <= 0)
+        return -1;
+
+    if (minHeap->tam == 1) {
+        minHeap->tam--;
+        return minHeap->vet[0];
+    }
+
+    //Armazena o menor elemento e substitui pelo último elemento
+    int r = minHeap->vet[0];
+    minHeap->vet[0] = minHeap->vet[minHeap->tam - 1];
+    minHeap->tam--;
+    retorno->trocas++;
+
+    //Corrige a propriedade da min heap
+    int i = 0;
+    while (1) {
+        int esq = 2 * i + 1;
+        int dir = 2 * i  + 2;
+        int menor = i;
+
+        if (esq < minHeap->tam && minHeap->vet[esq] < minHeap->vet[i]){
+            menor = esq;
+            retorno->comparacoes++;
+        }
+            
+
+        if (dir < minHeap->tam && minHeap->vet[dir] < minHeap->vet[menor]){
+            menor = dir;
+            retorno->comparacoes++;
+        }
+            
+        if (menor != i) {
+            int aux = minHeap->vet[i];
+            minHeap->vet[i] = minHeap->vet[menor];
+            minHeap->vet[menor] = aux;
+            i = menor;
+            retorno->trocas++;
+        } else {
+            break;
+        }
+    }
+
+    return r;
+}
+
+//Função para dividir o vetor em blocos e ordená-los usando quicksort
+Block *divideEOrdena(int vet[], int n, int tamBloco, tReturn *retorno) {
+
+    int numBlocos = (n + tamBloco - 1) / tamBloco;
+    Block *blocks = (Block *)malloc(numBlocos * sizeof(Block));
+
+    //Ordena cada bloco separadamente usando o quicksort
+    for (int i = 0; i < numBlocos; i++) {
+        int inicio = i * tamBloco;
+        int tamanhoBloco;
+        if (i == numBlocos - 1) {
+            tamanhoBloco = n - i * tamBloco;
+        } else {
+            tamanhoBloco = tamBloco;
+        }
+
+        blocks[i].vet = (int *)malloc(tamanhoBloco * sizeof(int));
+        for (int j = 0; j < tamanhoBloco; j++) {
+            blocks[i].vet[j] = vet[inicio + j];
+        }
+
+        //Ordena o bloco atual
+        QuickSort(blocks[i].vet, 0, tamanhoBloco - 1, retorno);
+
+        blocks[i].tamBloco = tamanhoBloco;
+        blocks[i].proxElem = 0;
+    }
+
+    return blocks;
+}
+
+
+//Função para mesclar os blocos em um vetor ordenado usando uma min heap de forma recursiva
+void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, MinHeap *minHeap, tReturn *retorno) {
+    //Verifica se a min heap não está vazia
+    if (minHeap->tam > 0) {
+        int min = extrairMin(minHeap, retorno);
+        vet[iAux++] = min;
+
+        //Encontra o bloco a partir do qual o elemento foi extraído
+        for (int i = 0; i < numBlocos; i++) {
+            if (blocks[i].vet[blocks[i].proxElem] == min) {
+                blocks[i].proxElem++;
+
+                // Se ainda houver elementos no bloco, insere o próximo elemento na min heap
+                if (blocks[i].proxElem < blocks[i].tamBloco) {
+                    insere(minHeap, blocks[i].vet[blocks[i].proxElem], retorno);
+                }
+                break;
+            }
+        }
+        mergeBlocksRec(blocks, numBlocos, n, vet, iAux, minHeap, retorno);
+    }
+}
+
+void mergeBlocks(Block blocks[], int numBlocos, int n, int vet[], tReturn *retorno) {
+    MinHeap *minHeap = criarMinHeap(numBlocos);
+
+    // Insere o primeiro elemento de cada bloco na min heap
+    for (int i = 0; i < numBlocos; i++) {
+        if (blocks[i].tamBloco > 0) {
+            insere(minHeap, blocks[i].vet[0], retorno);
+        }
+    }
+
+    mergeBlocksRec(blocks, numBlocos, n, vet, 0, minHeap, retorno);
+
+    free(minHeap->vet);
+    free(minHeap);
+
+}
+
+
+void BlockSort(int vet[], int n) {
+    tReturn *retorno = malloc(sizeof(tReturn));
+    retorno->comparacoes = 0;
+    retorno->trocas = 0;
+    int tamBloco = floor(sqrt(n));
+    Block *blocks = divideEOrdena(vet, n, tamBloco, retorno);
+    mergeBlocks(blocks, (n + tamBloco - 1) / tamBloco, n, vet, retorno);
+    printf("Comparações: %lld\n", retorno->comparacoes);
+    printf("Trocas: %lld\n", retorno->trocas);
+
+    free(blocks);
+    free(retorno);
+
+}
+
+
+void imprimeVetor(int vet[], int n){
+     for (int i = 0; i < n; i++)
+        printf("%d ", vet[i]);
+        printf("\n");
+}
+
 
 int *geraAleatorios(int tam, int semente)
 {
@@ -235,6 +404,8 @@ int *geraAleatorios(int tam, int semente)
 
 int *geraQuaseOrdenados(int tam, int porcentagem)
 {
+	// abordagem 1
+	/*
 	int* vetor = (int*)malloc(tam * sizeof(int));
 	int num_desordenados = tam * porcentagem / 100;
 	int* indices = (int*)malloc(tam * sizeof(int));
@@ -257,6 +428,28 @@ int *geraQuaseOrdenados(int tam, int porcentagem)
 	}
 
 	free(indices);
+	return vetor;
+
+
+  */
+
+	// abordagem 2
+	int *vetor = (int *)malloc(tam * sizeof(int));
+
+	for (int i = 0; i < tam; i++)
+	{
+
+		if (rand() % 100 < porcentagem)
+		{
+
+			vetor[i] = rand() % tam;
+		}
+		else
+		{
+
+			vetor[i] = i;
+		}
+	}
 
 	return vetor;
 }
@@ -787,15 +980,3 @@ void benchmarkBlockSort(int *vet_tam, int *vet_semente)
 	}
 }
 */
-
-int main()
-{
-
-	int vet_tam[5] = {5, 10, 15, 20, 25};
-	int vet_semente[5] = {1, 2, 3, 4, 5};
-	benchmarkMergeSort(vet_tam, vet_semente);
-	benchmarkQuickSort(vet_tam, vet_semente);
-	benchmarkInsertionSort(vet_tam, vet_semente);
-	benchmarkSelectionSort(vet_tam, vet_semente);
-	benchmarkBubbleSort(vet_tam, vet_semente);
-}
