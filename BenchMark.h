@@ -1,30 +1,20 @@
 #ifndef SORTING_ALGORITHMS_H
 #define SORTING_ALGORITHMS_H
 
-typedef struct
-{
-    int *vet;
-    int tam;
-    int capacidade;
-} MinHeap;
+typedef struct MinHeap MinHeap;
 
 // Estrutura para representar um bloco
-typedef struct
-{
-    int *vet;
-    int tamBloco;
-    int proxElem;
-} Block;
+typedef struct Block Block;
 
-
-typedef struct Return;
-void bubbleSort(int *vet, int tam);
-void selectionSort(int *vet, int tam);
-void insertionSort(int *vet, int tam);
-int particiona(int *vet, int inicio, int fim);
-void quickSort(int *vet, int inicio, int fim);
-void mergeSort(int *vet, int inicio, int fim) ;
-void merge(int *vet, int inicio, int meio, int fim);
+typedef struct Return tReturn;
+tReturn bubbleSort(int *vet, int tam);
+tReturn bubbleSortIntelgente(int *vet, int tam);
+tReturn SelectionSort(int *vet, int tam);
+tReturn InsertionSort(int *vet, int tam);
+int Particiona(int *vet, int inicio, int fim, tReturn *retorno);
+void QuickSort(int *vet, int inicio, int fim, tReturn *retorno);
+void MergeSort(int *vet, int inicio, int fim, tReturn *retorno) ;
+void Merge(int *vet, int inicio, int meio, int fim, tReturn *retorno);
 
 int* geraAleatorios(int tam, int semente);
 int* geraQuaseOrdenados(int tam, int porcentagem);
@@ -35,6 +25,8 @@ void benchmarkInsertionSort(int *vet_tam, int *vet_semente);
 void benchmarkQuickSort(int *vet_tam, int *vet_semente);
 void benchmarkMergeSort(int *vet_tam, int *vet_semente);
 
+
+/*
 MinHeap *criarMinHeap(int capacidade);
 int pai(int i);
 void insere(MinHeap *minHeap, int chave);
@@ -45,5 +37,6 @@ void mergeBlocksRec(Block blocks[], int numBlocos, int n, int vet[], int iAux, M
 void mergeBlocks(int vet[], Block blocks[], int numBlocos, int n);
 void BlockSort(int vet[], int n);
 void imprimeVetor(int vet[], int n);
+*/
 
 #endif /* SORTING_ALGORITHMS_H */
