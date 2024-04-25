@@ -55,6 +55,8 @@ void benchmarkSelectionSort(int *vet_tam, int *vet_semente);
 void benchmarkInsertionSort(int *vet_tam, int *vet_semente);
 void benchmarkQuickSort(int *vet_tam, int *vet_semente);
 void benchmarkMergeSort(int *vet_tam, int *vet_semente);
+void benchmarkBlockSort(int *vet_tam, int *vet_semente);
+void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente);
 
 
 #endif /* SORTING_ALGORITHMS_H */
