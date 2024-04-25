@@ -16,7 +16,7 @@ typedef struct
     int proxElem;
 } Block;
 
-typedef struct Return
+typedef struct
 {
     long long int trocas;
     long long int comparacoes;
