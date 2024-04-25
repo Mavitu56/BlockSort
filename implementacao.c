@@ -488,7 +488,7 @@ void benchmarkBubbleSort(int *vet_tam, int *vet_semente)
 	// Construção do cabeçalho da tabela
 	FILE *arq;
 	arq = fopen("resultados.txt", "a");
-	fprintf(arq, "\n\n\n------------------------------------------------------------------------------------------Tabela 1: Bubble Sort------------------------------------------------------------------------------------------\n\n");
+	fprintf(arq, "\n\n\n--------------------------------------------------------------------------------Tabela 1: Bubble Sort---------------------------------------------------------------------------------\n\n");
 
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
@@ -572,7 +572,7 @@ void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente)
 	// Construção do cabeçalho da tabela
 	FILE *arq;
 	arq = fopen("resultados.txt", "a");
-	fprintf(arq, "\n\n\n-------------------------------------------------------------------------------Tabela 1: Bubble Sort Inteligente------------------------------------------------------------------------------------\n\n");
+	fprintf(arq, "\n\n\n-------------------------------------------------------------------------------Tabela 2: Bubble Sort Inteligente------------------------------------------------------------------------------------\n\n");
 
 	// Ciclo de repetição de testes
 	for (int i = 0; i < 5; i++)
@@ -651,7 +651,7 @@ void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente)
 	}
 }
 
-void benchmarkBubbleSortInteligente(int *vet_tam, int *vet_semente)
+void benchmarkSelectionSort(int *vet_tam, int *vet_semente)
 {
 	// Construção do cabeçalho da tabela
 	FILE *arq;
